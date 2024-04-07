@@ -32,7 +32,7 @@ from sklearn.model_selection import StratifiedKFold
 
 main = tkinter.Tk()
 main.title("Identifying Bone Tumor using X-Ray Images") #designing main screen
-main.geometry("1600x1200")
+main.geometry("2140x1200")
 
 global filename
 global accuracy
@@ -103,7 +103,7 @@ def datasetPreprocessing():
                 name = directory[i]
                 img = cv2.imread(filename+"/no/"+name,0) #reading images
                 ret2,th2 = cv.threshold(img,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU) #processing and normalization images
-                img = cv2.resize(img, (128,128)) #resizing images
+                img = cv2.resize(img, (256,256)) #resizing images
                 im2arr = np.array(img) #extract features from images
                 im2arr = im2arr.reshape(128,128,1)
                 X.append(im2arr)
@@ -293,15 +293,15 @@ def graph():
  
 font = ('times', 16, 'bold')
 title = Label(main, text='Identifying Bone Tumor using X-Ray Images')
-title.config(bg='black', fg='white')  
+title.config(fg='white', bg='blue')  
 title.config(font=font)           
-title.config(height=3, width=150)       
-title.place(x=0,y=5)
+title.config(height=3, width=170)       
+title.place(x=0,y=0)
 
-font1 = ('times', 12, 'bold')
-text=Text(main,height=20,width=130)
+font1 = ('times', 14, 'normal')
+text=Text(main,height=18,width=150)
 scroll=Scrollbar(text)
-text.configure(yscrollcommand=scroll.set)
+text.configure(yscrollcommand=scroll.set, bg="black",fg='white',padx=10,pady=10)
 text.place(x=300,y=120)
 text.config(font=font1)
 
@@ -309,31 +309,31 @@ text.config(font=font1)
 font1 = ('times', 12, 'bold')
 uploadButton = Button(main, text="Upload Tumor X-Ray Images Dataset", command=uploadDataset)
 uploadButton.place(x=300,y=605)
-uploadButton.config(font=font1)  
+uploadButton.config(font=font1, bg='gold',padx=20,pady=7)  
 
 preprocessButton = Button(main, text="Dataset Preprocessing & Features Extraction", command=datasetPreprocessing)
 preprocessButton.place(x=725,y=605)
-preprocessButton.config(font=font1) 
+preprocessButton.config(font=font1, bg='gold',padx=20,pady=7) 
 
 cnnButton = Button(main, text="Trained CNN Bone Tumor Detection Model", command=trainTumorDetectionModel)
 cnnButton.place(x=1220,y=605)
-cnnButton.config(font=font1) 
-
-svmButton = Button(main, text="Trained SVM Bone Tumor Detection Model", command=trainSVMDetectionModel)
-svmButton.place(x=300, y=685)
-svmButton.config(font=font1)
+cnnButton.config(font=font1, bg='gold',padx=20,pady=7) 
 
 classifyButton = Button(main, text="Bone Tumor Segmentation & Classification", command=tumorClassification)
-classifyButton.place(x=725,y=685)
-classifyButton.config(font=font1)
+classifyButton.place(x=300,y=685)
+classifyButton.config(font=font1, bg='gold',padx=20,pady=7)
 
 graphButton = Button(main, text="CNN Training Accuracy Graph", command=graph)
-graphButton.place(x=1220,y=685)
-graphButton.config(font=font1)
+graphButton.place(x=725,y=685)
+graphButton.config(font=font1, bg='gold',padx=20,pady=7)
+
+svmButton = Button(main, text="Trained SVM Bone Tumor Detection Model", command=trainSVMDetectionModel)
+svmButton.place(x=1220, y=685)
+svmButton.config(font=font1, bg='gold',padx=20,pady=7)
 
 compareButton = Button(main, text="Compare SVM and CNN", command=compareAlgorithms)
 compareButton.place(x=300, y=765)
-compareButton.config(font=font1)
+compareButton.config(font=font1, bg='gold',padx=20,pady=7)
 
 main.config(bg='black')
 main.mainloop()
