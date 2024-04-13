@@ -286,7 +286,7 @@ def graph():
     plt.xlabel('Training Epoch')
     plt.ylabel('Accuracy/Loss')
     plt.plot(loss, 'ro-', label='Loss')  # Remove color='red'
-    plt.plot(accuracy, 'ro-', label='Accuracy')  # Remove color='green'
+    plt.plot(accuracy, 'go-', label='Accuracy')  # Remove color='green'
     plt.legend(loc='upper left')
     plt.title('Bone Tumor CNN Model Training Accuracy & Loss Graph')
     plt.show()
