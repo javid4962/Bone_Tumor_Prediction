@@ -152,9 +152,12 @@
 ### How to Execute
 
 > [!NOTE] 
-> Install Python 3.8.5 - Goto https://www.python.org/downloads/release/python-385/ - click on Windows x86-64 executable installer 
+> Install Python 3.8.5 - Goto https://www.python.org/downloads/release/python-385/ - click on Windows x86-64 executable installer. 
+>
 > Make sure to add python 3.8.5 to path.
 > 
-> Clone/Download this Repository and Extract it to the Desktop 
+> Clone/Download this Repository and Extract it to the Desktop.
+> 
 > Open this folder click on run.bat file - it will installs all packages that will be needed.
+>
 > And then it shows the output😉

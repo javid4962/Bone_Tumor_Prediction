@@ -87,7 +87,9 @@ def uploadDataset(): #function to upload dataset
     global filename
     filename = filedialog.askdirectory(initialdir=".")
     text.delete('1.0', END)
-    text.insert(END,filename+" loaded\n");
+    # messagebox.showinfo("Dataset Upload", f"Dataset loaded from {filename}")
+    text.insert(END, f"{filename} loaded\n")
+    # text.insert(END,filename+" loaded\n");
 
 def datasetPreprocessing():
     global X
@@ -126,9 +128,9 @@ def datasetPreprocessing():
         Y = np.asarray(Y)            
         np.save("Model/myimg_data.txt",X)
         np.save("Model/myimg_label.txt",Y)
-    print(X.shape)
-    print(Y.shape)
-    print(Y)
+    # print(X.shape)
+    # print(Y.shape)
+    # print(Y)
     cv2.imshow('ss',X[20])
     cv2.waitKey(0)
     text.insert(END,"Total number of images found in dataset : "+str(len(X))+"\n")
@@ -215,62 +217,104 @@ def tumorClassification():
         cv2.imshow("Edge Detected Image",edge_image)
         cv2.waitKey(0)
 
-def trainSVMDetectionModel():
-    global accuracy
-    global svm_model
-    global X
-    global Y
-    global text
+# def trainSVMDetectionModel():
+#     global accuracy
+#     global svm_model
+#     global X
+#     global Y
+#     global text
 
-    # Encode labels if not already encoded
-    label_encoder = LabelEncoder()
-    Y_encoded = label_encoder.fit_transform(Y)
+#     # Encode labels if not already encoded
+#     label_encoder = LabelEncoder()
+#     Y_encoded = label_encoder.fit_transform(Y)
 
-    # Convert labels to categorical format
-    YY = to_categorical(Y_encoded)
+#     # Convert labels to categorical format
+#     YY = to_categorical(Y_encoded)
 
-    # Split the dataset
-    x_train, x_test, y_train, y_test = train_test_split(X, YY, test_size=0.2, random_state=42)
+#     # Split the dataset
+#     x_train, x_test, y_train, y_test = train_test_split(X, YY, test_size=0.2, random_state=42)
 
-    # Reshape x_train and x_test
-    x_train_flattened = x_train.reshape(x_train.shape[0], -1)
-    x_test_flattened = x_test.reshape(x_test.shape[0], -1)
+#     # Reshape x_train and x_test
+#     x_train_flattened = x_train.reshape(x_train.shape[0], -1)
+#     x_test_flattened = x_test.reshape(x_test.shape[0], -1)
 
-    svm_model = create_svm_model()
-    svm_model.fit(x_train_flattened, np.argmax(y_train, axis=1))
+#     svm_model = create_svm_model()
+#     svm_model.fit(x_train_flattened, np.argmax(y_train, axis=1))
 
-    # Evaluate the SVM model on the test set
-    accuracy = svm_model.score(x_test_flattened, np.argmax(y_test, axis=1)) * 100
+#     # Evaluate the SVM model on the test set
+#     accuracy = svm_model.score(x_test_flattened, np.argmax(y_test, axis=1)) * 100
     
-    text.insert(END, '\n\nSVM Bone Tumor Model Generated.\n\n')
-    text.insert(END, "SVM Bone Tumor Prediction Accuracy on Test Images: {:.2f}%\n".format(accuracy))
+#     text.insert(END, '\n\nSVM Bone Tumor Model Generated.\n\n')
+#     text.insert(END, "SVM Bone Tumor Prediction Accuracy on Test Images: {:.2f}%\n".format(accuracy))
 
 
-def compareAlgorithms():
-    global svm_model
-    global classifier
-    global X
-    global Y
-    global accuracy
+# def compareAlgorithms():
+#     global svm_model
+#     global classifier
+#     global X
+#     global Y
+#     global accuracy
 
-    # Train SVM model and get accuracy
-    svm_accuracy = trainSVMDetectionModel()
+#     # Train SVM model and get accuracy
+#     svm_accuracy = trainSVMDetectionModel()
 
-    # Train CNN model
-    cnn_accuracy = trainTumorDetectionModel()
+#     # Train CNN model
+#     cnn_accuracy = trainTumorDetectionModel()
 
-    # Create a count plot
-    models = ['SVM', 'CNN']
-    accuracies = [svm_accuracy, cnn_accuracy]
+#     # Create a count plot
+#     models = ['SVM', 'CNN']
+#     accuracies = [svm_accuracy, cnn_accuracy]
 
-    # Plotting
-    plt.figure(figsize=(8, 6))
-    plt.bar(models, accuracies, color=['blue', 'green'])
-    plt.xlabel('Models')
-    plt.ylabel('Accuracy')
-    plt.title('SVM vs. CNN Bone Tumor Detection Model Comparison')
-    plt.ylim(0, 100)  # Adjust ylim if needed
-    plt.show()
+#     # Plotting
+#     plt.figure(figsize=(8, 6))
+#     plt.bar(models, accuracies, color=['blue', 'green'])
+#     plt.xlabel('Models')
+#     plt.ylabel('Accuracy')
+#     plt.title('SVM vs. CNN Bone Tumor Detection Model Comparison')
+#     plt.ylim(0, 100)  # Adjust ylim if needed
+#     plt.show()
+
+
+def enhance_and_save_image(input_image_path):
+    # Read the input image
+    img = cv2.imread(input_image_path, cv2.IMREAD_GRAYSCALE)
+
+    # Apply histogram equalization
+    enhanced_img = cv2.equalizeHist(img)
+
+    # Get the filename and folder path
+    filename = os.path.basename(input_image_path)
+    folder_path = os.path.dirname(input_image_path)
+
+    # Check if the parent folder is already an "enhanced_images" folder
+    if os.path.basename(folder_path) != "enhanced_images":
+        # If not, create the "enhanced_images" folder
+        save_folder = os.path.join(folder_path, "enhanced_images")
+        if not os.path.exists(save_folder):
+            os.makedirs(save_folder)
+    else:
+        # If the parent folder is already "enhanced_images", use it as the save_folder
+        save_folder = folder_path
+    # Save the enhanced image in the "enhanced_images" folder
+    save_path = os.path.join(save_folder, filename)
+    # Check if the file already exists
+    if os.path.exists(save_path):
+        os.remove(save_path)  # Remove the existing file
+
+
+    cv2.imwrite(save_path, enhanced_img)
+
+    return save_path
+
+def select_and_enhance_image():
+    # Open a file dialog for image selection
+    file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg;*.jpeg;*.png;*.bmp")])
+    if file_path:
+        # Call the enhance_and_save_image function with the selected image path
+        enhanced_image_path = enhance_and_save_image(file_path)
+
+        # Display a message box with the path to the saved enhanced image
+        # messagebox.showinfo("Enhanced Image Saved", f"The enhanced image has been saved at:\n{enhanced_image_path}")
 
 
 def graph():
@@ -301,7 +345,7 @@ title.place(x=0,y=0)
 font1 = ('times', 14, 'normal')
 text=Text(main,height=18,width=150)
 scroll=Scrollbar(text)
-text.configure(yscrollcommand=scroll.set, bg="black",fg='white',padx=10,pady=10)
+text.configure(yscrollcommand=scroll.set, bg="black",fg='red',padx=10,pady=10)
 text.place(x=300,y=120)
 text.config(font=font1)
 
@@ -319,21 +363,30 @@ cnnButton = Button(main, text="Trained CNN Bone Tumor Detection Model", command=
 cnnButton.place(x=1220,y=605)
 cnnButton.config(font=font1, bg='gold',padx=20,pady=7) 
 
+enhance_button = Button(main, text="Select and Enhance Image", command=select_and_enhance_image)
+enhance_button.place(x=300, y=685)
+enhance_button.config(font=font1, bg='gold',padx=20,pady=7)
+
 classifyButton = Button(main, text="Bone Tumor Segmentation & Classification", command=tumorClassification)
-classifyButton.place(x=300,y=685)
+classifyButton.place(x=725,y=685)
 classifyButton.config(font=font1, bg='gold',padx=20,pady=7)
 
 graphButton = Button(main, text="CNN Training Accuracy Graph", command=graph)
-graphButton.place(x=725,y=685)
+graphButton.place(x=1220,y=685)
 graphButton.config(font=font1, bg='gold',padx=20,pady=7)
 
-svmButton = Button(main, text="Trained SVM Bone Tumor Detection Model", command=trainSVMDetectionModel)
-svmButton.place(x=1220, y=685)
-svmButton.config(font=font1, bg='gold',padx=20,pady=7)
 
-compareButton = Button(main, text="Compare SVM and CNN", command=compareAlgorithms)
-compareButton.place(x=300, y=765)
-compareButton.config(font=font1, bg='gold',padx=20,pady=7)
+
+# svmButton = Button(main, text="Trained SVM Bone Tumor Detection Model", command=trainSVMDetectionModel)
+# svmButton.place(x=1220, y=685)
+# svmButton.config(font=font1, bg='gold',padx=20,pady=7)
+
+# compareButton = Button(main, text="Compare SVM and CNN", command=compareAlgorithms)
+# compareButton.place(x=300, y=765)
+# compareButton.config(font=font1, bg='gold',padx=20,pady=7)
+
+
 
 main.config(bg='black')
 main.mainloop()
+
