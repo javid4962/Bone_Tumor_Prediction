@@ -60,9 +60,9 @@ def edgeDetection():
     result = orig.copy()
     for c in contours:
         area = cv2.contourArea(c)
-        cv2.drawContours(result, [c], -1, (0, 0, 255), 10)
+        cv2.drawContours(result, [c], -1, (0, 0, 255), 2)
         if area > min_area and area < max_area:
-            cv2.drawContours(result, [c], -1, (0, 255, 255), 10)
+            cv2.drawContours(result, [c], -1, (0, 255, 255), 2)
     return result    
 
 def tumorSegmentation(filename):
@@ -94,8 +94,9 @@ def uploadDataset(): #function to upload dataset
 def datasetPreprocessing():
     global X
     global Y
-    X.clear()
-    Y.clear()
+    # X.clear()
+    # Y.clear()
+    image_count = 0  # Initialize image count
     if os.path.exists('Model/myimg_data.txt.npy'):
         X = np.load('Model/myimg_data.txt.npy')
         Y = np.load('Model/myimg_label.txt.npy')
@@ -104,39 +105,43 @@ def datasetPreprocessing():
             for i in range(len(directory)):
                 name = directory[i]
                 img = cv2.imread(filename+"/no/"+name,0) #reading images
-                ret2,th2 = cv.threshold(img,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU) #processing and normalization images
-                img = cv2.resize(img, (256,256)) #resizing images
+                ret2,th2 = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU) #processing and normalization images
+                img = cv2.resize(img, (128,128)) #resizing images
                 im2arr = np.array(img) #extract features from images
+                print(im2arr.shape)
                 im2arr = im2arr.reshape(128,128,1)
                 X.append(im2arr)
                 Y.append(0)
                 print(filename+"/no/"+name)
+                image_count += 1  # Increment image count
 
         for root, dirs, directory in os.walk(filename+"/yes"):
             for i in range(len(directory)):
                 name = directory[i]
                 img = cv2.imread(filename+"/yes/"+name,0)
-                ret2,th2 = cv.threshold(img,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
+                ret2,th2 = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
                 img = cv2.resize(img, (128,128))
                 im2arr = np.array(img)
                 im2arr = im2arr.reshape(128,128,1)
                 X.append(im2arr)
                 Y.append(1)
                 print(filename+"/yes/"+name)
+                image_count += 1  # Increment image count
                 
-        X = np.asarray(X)
-        Y = np.asarray(Y)            
-        np.save("Model/myimg_data.txt",X)
-        np.save("Model/myimg_label.txt",Y)
+    X = np.asarray(X)
+    Y = np.asarray(Y)            
+    np.save("Model/myimg_data.txt",X)
+    np.save("Model/myimg_label.txt",Y)
     # print(X.shape)
     # print(Y.shape)
     # print(Y)
     cv2.imshow('ss',X[20])
     cv2.waitKey(0)
-    text.insert(END,"Total number of images found in dataset : "+str(len(X))+"\n")
+    # text.insert(END,"Total number of images found in dataset : "+str(image_count)+"\n")  # Use the updated image count
+    text.insert(END,"Total number of images found in dataset : "+str(len(X))+"\n")  # Use the updated image count
     text.insert(END,"Total number of classes : "+str(len(set(Y)))+"\n\n")
     text.insert(END,"Class labels found in dataset : "+str(disease))
-     
+  
 def trainTumorDetectionModel():
     global accuracy
     global classifier
