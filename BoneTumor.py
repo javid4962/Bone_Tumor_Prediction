@@ -135,6 +135,55 @@ def datasetPreprocessing():
     text.insert(END,"Total number of classes : "+str(len(set(Y)))+"\n\n")
     text.insert(END,"Class labels found in dataset : "+str(disease))
      
+# def trainTumorDetectionModel():
+#     global accuracy
+#     global classifier
+    
+#     YY = to_categorical(Y)
+
+#     indices = np.arange(X.shape[0])
+#     np.random.shuffle(indices)
+
+#     x_train = X[indices]
+#     y_train = YY[indices]
+
+#     if os.path.exists('Model/model.json'):
+#         with open('Model/model.json', "r") as json_file:
+#             loaded_model_json = json_file.read()
+#             classifier = model_from_json(loaded_model_json)
+
+#         classifier.load_weights("Model/model_weights.h5")
+#         classifier._make_predict_function()           
+#     else:
+#         X_trains, X_tests, y_trains, y_tests = train_test_split(x_train, y_train, test_size=0.2, random_state=0)
+#         classifier = Sequential() 
+#         classifier.add(Convolution2D(32, 3, 3, input_shape=(128, 128, 1), activation='relu'))
+#         classifier.add(MaxPooling2D(pool_size=(2, 2)))
+#         classifier.add(Convolution2D(32, 3, 3, activation='relu'))
+#         classifier.add(MaxPooling2D(pool_size=(2, 2)))
+#         classifier.add(Flatten())
+#         classifier.add(Dense(output_dim=128, activation='relu'))
+#         classifier.add(Dense(output_dim=2, activation='softmax'))
+#         print(classifier.summary())
+#         classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+#         hist = classifier.fit(x_train, y_train, batch_size=16, epochs=10, validation_split=0.2, shuffle=True, verbose=2)
+#         classifier.save_weights('Model/model_weights.h5')            
+#         model_json = classifier.to_json()
+#         with open("Model/model.json", "w") as json_file:
+#             json_file.write(model_json)
+#         f = open('Model/history.pckl', 'wb')
+#         pickle.dump(hist.history, f)
+#         f.close()
+
+#     f = open('Model/history.pckl', 'rb')
+#     data = pickle.load(f)
+#     f.close()
+#     acc = data['accuracy']
+#     accuracy = acc[-1] * 100  # Use the last accuracy value
+#     text.insert(END, '\n\nCNN Bone Tumor Model Generated.\n\n')
+#     text.insert(END, "CNN Bone Tumor Prediction Accuracy on Test Images: {:.2f}%\n".format(accuracy))
+
+
 def trainTumorDetectionModel():
     global accuracy
     global classifier
@@ -166,7 +215,14 @@ def trainTumorDetectionModel():
         classifier.add(Dense(output_dim=2, activation='softmax'))
         print(classifier.summary())
         classifier.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-        hist = classifier.fit(x_train, y_train, batch_size=16, epochs=10, validation_split=0.2, shuffle=True, verbose=2)
+
+        # Define early stopping criteria
+        early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
+        hist = classifier.fit(x_train, y_train, batch_size=16, epochs=100, 
+                               validation_split=0.2, shuffle=True, verbose=2,
+                               callbacks=[early_stopping])
+
         classifier.save_weights('Model/model_weights.h5')            
         model_json = classifier.to_json()
         with open("Model/model.json", "w") as json_file:
@@ -182,6 +238,7 @@ def trainTumorDetectionModel():
     accuracy = acc[-1] * 100  # Use the last accuracy value
     text.insert(END, '\n\nCNN Bone Tumor Model Generated.\n\n')
     text.insert(END, "CNN Bone Tumor Prediction Accuracy on Test Images: {:.2f}%\n".format(accuracy))
+
 
 def create_svm_model():
     svm_model = SVC(kernel='linear', C=1)  # You can customize kernel and C parameters
@@ -258,6 +315,11 @@ def compareAlgorithms():
 
     # Train CNN model
     cnn_accuracy = trainTumorDetectionModel()
+
+    # Ensure accuracies are valid numeric values
+    if svm_accuracy is None or cnn_accuracy is None:
+        messagebox.showerror("Error", "Failed to train models. Check your data or parameters.")
+        return
 
     # Create a count plot
     models = ['SVM', 'CNN']
