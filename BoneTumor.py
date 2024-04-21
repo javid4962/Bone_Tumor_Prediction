@@ -82,7 +82,6 @@ def tumorSegmentation(filename):
     edge_detection = edgeDetection()
     return segmented_image*255, edge_detection
     
-
 def uploadDataset(): #function to upload dataset
     global filename
     filename = filedialog.askdirectory(initialdir=".")
@@ -131,7 +130,7 @@ def datasetPreprocessing():
     print(Y)
     cv2.imshow('ss',X[20])
     cv2.waitKey(0)
-    text.insert(END,"Total number of images found in dataset 1 : "+str(len(X))+"\n")
+    text.insert(END,"Total number of images found in dataset : "+str(len(X))+"\n")
     # text.insert(END,"Total number of images found in dataset 2 : "+"500"+"\n")
     text.insert(END,"Total number of classes : "+str(len(set(Y)))+"\n\n")
     text.insert(END,"Class labels found in dataset : "+str(disease))
